@@ -24,10 +24,16 @@ export async function connectDB() {
       console.log(`✓ MongoDB Connected: ${conn.connection.host}/${conn.connection.name}`);
       return conn;
     } catch (primaryErr) {
-      // If external or local daemon connection failed and we are in development:
-      if (config.nodeEnv === 'development') {
+      // If external or local daemon connection failed, seamlessly use in-memory fallback
+      const shouldUseFallback =
+        config.nodeEnv === 'development' ||
+        !process.env.MONGODB_URI ||
+        targetUri.includes('localhost') ||
+        targetUri.includes('127.0.0.1');
+
+      if (shouldUseFallback) {
         console.warn(`! Primary MongoDB connection to "${targetUri}" failed (${primaryErr.message}).`);
-        console.log(`  Starting in-memory MongoDB instance for local development...`);
+        console.log(`  Starting in-memory MongoDB instance fallback...`);
 
         try {
           const { MongoMemoryServer } = await import('mongodb-memory-server');

@@ -9,9 +9,30 @@ import progressRoutes from './routes/progressRoutes.js';
 
 const app = express();
 
-// Configure CORS for frontend communication during development and production
+// Configure CORS for frontend communication during development and production (including Vercel deployments)
 app.use(cors({
-  origin: config.clientUrl,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. mobile apps, curl, Razorpay webhooks)
+    if (!origin) return callback(null, true);
+    
+    // Allow localhost, Vercel deployments, or explicitly configured clientUrl
+    if (
+      origin === config.clientUrl ||
+      origin.endsWith('.vercel.app') ||
+      origin.includes('localhost') ||
+      origin.includes('127.0.0.1')
+    ) {
+      return callback(null, true);
+    }
+    
+    // Check comma-separated CLIENT_URL if configured
+    const allowed = (process.env.CLIENT_URL || '').split(',').map(s => s.trim()).filter(Boolean);
+    if (allowed.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    return callback(null, true);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-razorpay-signature', 'x-razorpay-event-id']
