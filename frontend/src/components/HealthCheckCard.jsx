@@ -15,7 +15,7 @@ export default function HealthCheckCard({ healthState, onRefresh }) {
           >
             <span className={`status-dot ${loading ? 'loading' : ok ? 'online' : 'offline'}`}></span>
             <span>
-              {loading ? 'Testing...' : ok ? 'API Online (Port 5000)' : 'API Offline'}
+              {loading ? 'Testing...' : ok ? 'API Online' : 'API Offline'}
             </span>
           </div>
         </div>

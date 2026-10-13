@@ -88,14 +88,14 @@ export default function Navbar({
             </svg>
           </button>
 
-          {/* Backend Status Live Badge (Phase 1 Integration Preserved) */}
+          {/* Backend Status Live Badge */}
           <button
             className={`backend-status-pill ${isBackendOnline ? 'online' : 'offline'}`}
             onClick={onOpenHealthModal}
             title={`Backend API: ${isBackendOnline ? 'Online' : 'Offline'} (${latencyMs || 0}ms). Click for Diagnostics.`}
           >
             <span className={`status-dot ${isBackendOnline ? 'online' : 'offline'}`}></span>
-            <span>{isBackendOnline ? 'API 5000' : 'Offline'}</span>
+            <span>{isBackendOnline ? 'API Online' : 'Offline'}</span>
           </button>
 
           {/* Authenticated User Profile Badge OR Sign In / Register Buttons */}
