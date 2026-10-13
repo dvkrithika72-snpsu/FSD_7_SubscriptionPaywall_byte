@@ -111,6 +111,8 @@ export async function createOrder(req, res) {
       planName: plan.name,
       planDescription: plan.description,
       receipt: paymentRecord.receipt,
+      isGenuineRazorpayOrder: Boolean(order.isGenuineRazorpayOrder),
+      isConfigured: isRealRazorpayConfigured(),
     });
   } catch (error) {
     console.error('createOrder error:', error);

@@ -99,10 +99,18 @@ export default function PricingModal({
 
       setActiveOrder(orderRes);
 
-      // 2. Attempt to open Razorpay Test Mode checkout modal if script loads
+      // 2. Determine whether a genuine Razorpay test key is active
+      const isKeyGenuine = Boolean(
+        orderRes.keyId &&
+        orderRes.keyId.startsWith('rzp_test_') &&
+        !orderRes.keyId.includes('your_key') &&
+        !orderRes.keyId.includes('mock') &&
+        !orderRes.keyId.includes('placeholder')
+      );
+
       const scriptLoaded = await loadRazorpayScript();
 
-      if (scriptLoaded && window.Razorpay) {
+      if (isKeyGenuine && orderRes.isGenuineRazorpayOrder !== false && scriptLoaded && window.Razorpay) {
         const options = {
           key: orderRes.keyId,
           amount: orderRes.amount,
@@ -142,17 +150,17 @@ export default function PricingModal({
             setIsProcessing(false);
             setErrorNotice({
               type: 'error',
-              title: 'Payment Failed',
-              message: resp.error?.description || 'Test payment was declined or cancelled.',
+              title: 'Payment Incomplete',
+              message: resp.error?.description || 'Payment was declined or closed. You can retry or complete via sandbox test verification.',
             });
           });
           rzp.open();
         } catch (openErr) {
           console.warn('Razorpay modal open exception, fallback to sandbox verification:', openErr);
-          // If modal open fails (e.g. key is local sandbox mock), user can use sandbox test verification
           setIsProcessing(false);
         }
       } else {
+        // Safe developer/sandbox mode: Do not launch broken Razorpay iframe with placeholder keys
         setIsProcessing(false);
       }
     } catch (err) {
